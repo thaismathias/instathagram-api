@@ -8,21 +8,17 @@
 		<version>2.3.3.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.thais.IG-api</groupId>
-	<artifactId>IG-api</artifactId>
+	<groupId>com.instathagram</groupId>
+	<artifactId>instathagram-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>IG-api</name>
-	<description>Api do IG</description>
+	<name>instathagram API</name>
+	<description>Api do InstaTHAgram</description>
 
 	<properties>
 		<java.version>11</java.version>
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
