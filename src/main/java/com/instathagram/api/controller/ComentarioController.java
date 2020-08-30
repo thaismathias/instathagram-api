@@ -58,7 +58,7 @@ public class ComentarioController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> remover(@PathVariable Long comentarioId) {
         if (!comentarioRepository.existsById(comentarioId)){
-            return ResponseEntity.notFound().build(); //ToDo Comentário não encontrado
+            return ResponseEntity.notFound().build();
         }
         gestaoPostagemService.excluirComentario(comentarioId);
 
