@@ -1,6 +1,5 @@
 package com.instathagram.service;
 
-import com.instathagram.exception.EntidadeNaoEncontradaException;
 import com.instathagram.exception.NegocioException;
 import com.instathagram.model.Comentario;
 import com.instathagram.model.Perfil;
@@ -59,15 +58,12 @@ public class GestaoPostagemService {
     }
 
     //Add comentário em uma postagem
-    public Comentario addComentario(Long postagemId, String descricao) {
-        Postagem postagem = postagemRepository.findById(postagemId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException("Foto não encontrada."));
+    public Comentario addComentario(Postagem postagem, Perfil comentarioPerfil, Comentario comentario) {
 
         postagem.setN_comentarios(postagem.getN_comentarios() + 1);
 
-        Comentario comentario = new Comentario();
+        comentario.setPerfil(comentarioPerfil);
         comentario.setDataEnvio(OffsetDateTime.now());
-        comentario.setDescricao(descricao);
         comentario.setPostagem(postagem);
 
         return comentarioRepository.save(comentario);

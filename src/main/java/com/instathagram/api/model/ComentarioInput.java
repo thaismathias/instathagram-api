@@ -7,17 +7,17 @@ import javax.validation.constraints.NotNull;
 public class ComentarioInput {
 
     @NotNull
-    private PerfilIdInput perfilId;
+    private PerfilIdInput perfil;
 
     @NotBlank
     private String descricao;
 
-    public PerfilIdInput getPerfilId() {
-        return perfilId;
+    public PerfilIdInput getPerfil() {
+        return perfil;
     }
 
-    public void setPerfilId(PerfilIdInput perfilId) {
-        this.perfilId = perfilId;
+    public void setPerfil(PerfilIdInput perfil) {
+        this.perfil = perfil;
     }
 
     public String getDescricao() {

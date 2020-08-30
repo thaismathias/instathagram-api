@@ -30,15 +30,16 @@ public class PostagemController {
     @Autowired
     private ModelMapper modelMapper;
 
-
     //Listar todas postagens
     @GetMapping
-    public List<PostagemOutput> listar(){
-        return toCollectionModel(postagemRepository.findAll());
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<PostagemOutput>> listar(){
+        return ResponseEntity.ok(toCollectionModel(postagemRepository.findAll()));
     }
 
     //Abrir post específico
     @GetMapping("/{postagemId}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PostagemOutput> post(@PathVariable Long postagemId) {
         Optional<Postagem> postagem = postagemRepository.findById(postagemId);
 
@@ -52,14 +53,15 @@ public class PostagemController {
     //Novo post
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PostagemOutput novo(@Valid @RequestBody PostagemInput postagemInput) {
+    public ResponseEntity<PostagemOutput> novo(@Valid @RequestBody PostagemInput postagemInput) {
         Postagem postagem = toEntity(postagemInput);
 
-        return toModel(gestaoPostagemService.criar(postagem));
+        return new ResponseEntity<>(toModel(gestaoPostagemService.criar(postagem)), HttpStatus.CREATED);
     }
 
     //Excluir post
     @DeleteMapping("/{postagemId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> remover(@PathVariable Long postagemId) {
         if (!postagemRepository.existsById(postagemId)){
             return ResponseEntity.notFound().build();

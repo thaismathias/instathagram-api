@@ -7,6 +7,15 @@ public class ComentarioOutput {
     private Long id;
     private String descricao;
     private OffsetDateTime dataEnvio;
+    private PerfilOutput perfil;
+
+    public PerfilOutput getPerfil() {
+        return perfil;
+    }
+
+    public void setPerfil(PerfilOutput perfil) {
+        this.perfil = perfil;
+    }
 
     public Long getId() {
         return id;
