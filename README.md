@@ -5,7 +5,7 @@ Obs.:Essa API não possui sistema de autenticação. Portanto, as ações não v
 
 ## Index
 
-- [API instaTHAgram](#API instaTHAgram)
+- API instaTHAgram
   - [Index](#index)
   - [Rodando Aplicação](#rodando-aplicao)
   - [Testando Aplicação](#testando-aplicao)
