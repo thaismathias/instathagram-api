@@ -252,7 +252,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"descricao\": \"Hey\"\r\n}",
+							"raw": "{\r\n    \"perfil\": {\r\n        \"id\": 2\r\n    },\r\n    \"descricao\": \"Hey\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
