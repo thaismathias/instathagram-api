@@ -1,11 +1,14 @@
 package com.instathagram.api.controller;
 
+import com.instathagram.api.model.PerfilInput;
 import com.instathagram.model.Comentario;
+import com.instathagram.model.Perfil;
 import com.instathagram.model.Postagem;
 import com.instathagram.exception.EntidadeNaoEncontradaException;
 import com.instathagram.api.model.ComentarioInput;
 import com.instathagram.api.model.ComentarioOutput;
 import com.instathagram.repository.ComentarioRepository;
+import com.instathagram.repository.PerfilRepository;
 import com.instathagram.repository.PostagemRepository;
 import com.instathagram.service.GestaoPostagemService;
 import org.modelmapper.ModelMapper;
@@ -28,6 +31,9 @@ public class ComentarioController {
     private ModelMapper modelMapper;
 
     @Autowired
+    private PerfilRepository perfilRepository;
+
+    @Autowired
     private PostagemRepository postagemRepository;
 
     @Autowired
@@ -36,21 +42,27 @@ public class ComentarioController {
     //Adicionar comentário
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ComentarioOutput add(@PathVariable Long postagemId,
+    public ResponseEntity<ComentarioOutput> add(@PathVariable Long postagemId,
                                 @Valid @RequestBody ComentarioInput comentarioInput) {
-        Comentario comentario = gestaoPostagemService.addComentario(postagemId,
-                comentarioInput.getDescricao());
+        Postagem postagem = postagemRepository.findById(postagemId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Foto não encontrada."));
 
-        return toModel (comentario);
+        Perfil comentarioPerfil = perfilRepository.findById(comentarioInput.getPerfil().getId())
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Perfil não encontrado."));
+
+        Comentario comentario = gestaoPostagemService.addComentario(postagem, comentarioPerfil, toEntity(comentarioInput));
+
+        return new ResponseEntity<>(toModel(comentario), HttpStatus.CREATED);
     }
 
     //Listar comantários
     @GetMapping
-    public List<ComentarioOutput> listar(@PathVariable Long postagemId) {
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<ComentarioOutput>> listar(@PathVariable Long postagemId) {
         Postagem postagem = postagemRepository.findById(postagemId)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Foto não encontrada."));
 
-        return toCollectionModel(postagem.getComentarios());
+        return new ResponseEntity<>(toCollectionModel(postagem.getComentarios()), HttpStatus.OK);
     }
 
     //Deletar comentário
@@ -63,6 +75,10 @@ public class ComentarioController {
         gestaoPostagemService.excluirComentario(comentarioId);
 
         return ResponseEntity.noContent().build(); //Retorna 204
+    }
+
+    private Comentario toEntity(ComentarioInput comentarioInput) {
+        return modelMapper.map(comentarioInput, Comentario.class);
     }
 
     private ComentarioOutput toModel(Comentario comentario){
