@@ -30,12 +30,14 @@ public class PerfilController {
 
     //Listar todos os perfis
     @GetMapping
-    public List<PerfilOutput> listar(){
-        return toCollectionModel(perfilRepository.findByContaAtiva(true));
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<List<PerfilOutput>> listar(){
+        return ResponseEntity.ok(toCollectionModel(perfilRepository.findByContaAtiva(true)));
     }
 
     //Apresentar dados do perfil
     @GetMapping("/{perfilId}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PerfilOutput> getPerfil(@PathVariable Long perfilId) {
         Optional<Perfil> perfil = perfilRepository.findByIdAndContaAtiva(perfilId, true);
 
