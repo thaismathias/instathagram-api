@@ -1,5 +1,6 @@
 package com.instathagram.api.controller;
 
+import com.instathagram.exception.EntidadeNaoEncontradaException;
 import com.instathagram.model.Perfil;
 import com.instathagram.service.PerfilService;
 import com.instathagram.api.model.PerfilInput;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -39,13 +39,11 @@ public class PerfilController {
     @GetMapping("/{perfilId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PerfilOutput> getPerfil(@PathVariable Long perfilId) {
-        Optional<Perfil> perfil = perfilRepository.findByIdAndContaAtiva(perfilId, true);
+        Perfil perfil = perfilRepository.findByIdAndContaAtiva(perfilId,true)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Perfil não encontrado."));
 
-        if (perfil.isPresent()) {
-            PerfilOutput perfilOutput = toModel(perfil.get());
-            return ResponseEntity.ok(perfilOutput);
-        }
-        return ResponseEntity.notFound().build();
+        PerfilOutput perfilOutput = toModel(perfil);
+        return ResponseEntity.ok(perfilOutput);
     }
 
     //Abrir conta
@@ -61,26 +59,25 @@ public class PerfilController {
     @DeleteMapping("/{perfilId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> deletePerfil(@PathVariable Long perfilId) {
-        Optional<Perfil> perfil = perfilRepository.findById(perfilId);
+        Perfil perfil = perfilRepository.findById(perfilId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Perfil não encontrado."));
 
-        if (perfil.isPresent()) {
-            perfilService.delete(perfil.get());
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        perfilService.delete(perfil);
+
+        return ResponseEntity.noContent().build();
     }
 
     //Reativar conta
     @PutMapping("/{perfilId}/reativar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> reativarPerfil(@PathVariable Long perfilId) {
-        Optional<Perfil> perfil = perfilRepository.findByIdAndContaAtiva(perfilId, false);
 
-        if (perfil.isPresent()) {
-            perfilService.reativar(perfil.get());
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        Perfil perfil = perfilRepository.findByIdAndContaAtiva(perfilId,false)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Perfil não encontrado."));
+
+        perfilService.reativar(perfil);
+
+        return ResponseEntity.noContent().build();
     }
 
     private Perfil toEntity(PerfilInput perfilInput) {
@@ -93,7 +90,7 @@ public class PerfilController {
 
     private List<PerfilOutput> toCollectionModel(List<Perfil> perfil) {
         return perfil.stream()
-                .map(per -> toModel(per))
+                .map(this::toModel)
                 .collect(Collectors.toList());
     }
 

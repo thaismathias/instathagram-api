@@ -2,6 +2,7 @@ package com.instathagram.api.controller;
 
 
 import com.instathagram.api.model.PostagemInput;
+import com.instathagram.exception.EntidadeNaoEncontradaException;
 import com.instathagram.model.Postagem;
 import com.instathagram.service.GestaoPostagemService;
 import com.instathagram.api.model.PostagemOutput;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,13 +41,12 @@ public class PostagemController {
     @GetMapping("/{postagemId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PostagemOutput> post(@PathVariable Long postagemId) {
-        Optional<Postagem> postagem = postagemRepository.findById(postagemId);
+        Postagem postagem = postagemRepository.findById(postagemId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Postagem não encontrada."));
 
-        if (postagem.isPresent()) {
-            PostagemOutput postagemOutput = toModel(postagem.get());
-            return ResponseEntity.ok(postagemOutput);
-        }
-        return ResponseEntity.notFound().build();
+        PostagemOutput postagemOutput = toModel(postagem);
+
+        return ResponseEntity.ok(postagemOutput);
     }
 
     //Novo post
@@ -63,9 +62,9 @@ public class PostagemController {
     @DeleteMapping("/{postagemId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> remover(@PathVariable Long postagemId) {
-        if (!postagemRepository.existsById(postagemId)){
-            return ResponseEntity.notFound().build();
-        }
+        Postagem postagem = postagemRepository.findById(postagemId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Postagem não encontrada."));
+
         gestaoPostagemService.excluir(postagemId);
 
         return ResponseEntity.noContent().build();
@@ -77,7 +76,7 @@ public class PostagemController {
 
     private List<PostagemOutput> toCollectionModel(List<Postagem> postagem) {
         return postagem.stream()
-                .map(p -> toModel(p))
+                .map(this::toModel)
                 .collect(Collectors.toList());
     }
 

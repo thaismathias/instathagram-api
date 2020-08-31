@@ -1,6 +1,6 @@
 package com.instathagram.service;
 
-import com.instathagram.exception.NegocioException;
+import com.instathagram.exception.EntidadeNaoEncontradaException;
 import com.instathagram.model.Comentario;
 import com.instathagram.model.Perfil;
 import com.instathagram.model.Postagem;
@@ -28,11 +28,11 @@ public class GestaoPostagemService {
     private ComentarioRepository comentarioRepository;
 
     //Postar foto
-    public Postagem criar(Postagem postagem){
+    public Postagem criar(Postagem postagem) {
         Perfil perfil = perfilRepository.findByIdAndContaAtiva(postagem.getPerfil().getId(), true)
-                .orElseThrow(() -> new NegocioException("Perfil não encontrado ou inativo."));
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Perfil não encontrado ou inativo."));
 
-        perfil.setN_publicacao(perfil.getN_publicacao() +1);
+        perfil.setN_publicacao(perfil.getN_publicacao() + 1);
 
         postagem.setPerfil(perfil);
         postagem.setDataPostagem(OffsetDateTime.now());
@@ -42,19 +42,17 @@ public class GestaoPostagemService {
 
     //Deletar foto
     public void excluir(Long postagemId) {
+        Postagem postagem = postagemRepository.findById(postagemId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Postagem não encontrda."));
 
-        Optional<Postagem> postagem = postagemRepository.findById(postagemId);
+        Perfil perfil = postagem.getPerfil();
 
-        if (postagem.isPresent()) {
-            Perfil perfil = postagem.get().getPerfil();
-
-            if (perfil.getN_publicacao() > 0) {
-                perfil.setN_publicacao(perfil.getN_publicacao() - 1);
-                perfilRepository.save(perfil);
-            }
-
-            postagemRepository.deleteById(postagemId);
+        if (perfil.getN_publicacao() > 0) {
+            perfil.setN_publicacao(perfil.getN_publicacao() - 1);
+            perfilRepository.save(perfil);
         }
+
+        postagemRepository.delete(postagem);
     }
 
     //Add comentário em uma postagem
@@ -85,7 +83,4 @@ public class GestaoPostagemService {
             }
         }
     }
-
-
-
 }
